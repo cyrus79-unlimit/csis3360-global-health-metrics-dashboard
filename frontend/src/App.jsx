@@ -35,7 +35,6 @@ export default function App() {
             }}
           >
             PulseMetrics{" "}
-            <span style={{ color: "#3b82f6", fontWeight: "400" }}>AI</span>
           </span>
         </div>
         <div
