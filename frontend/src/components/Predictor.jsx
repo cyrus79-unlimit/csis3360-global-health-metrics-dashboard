@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
 
+// 🌐 Dynamic API URL: Uses Vercel's environment variable when deployed online,
+// otherwise defaults to local server!
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
 export default function Predictor() {
   const [inputs, setInputs] = useState({
     schooling: 12.0,
@@ -26,15 +30,18 @@ export default function Predictor() {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/predict",
-        inputs,
-      );
+      // Send all 5 expected features (including status_developing)
+      const payload = {
+        ...inputs,
+        status_developing: 1, // Default dummy encoding value
+      };
+
+      const response = await axios.post(`${API_BASE_URL}/api/predict`, payload);
       setPrediction(response.data.predicted_life_expectancy);
     } catch (err) {
       console.error(err);
       setError(
-        "Could not establish connection with the backend. Ensure your FastAPI server is still running!",
+        "Could not establish connection with the backend. Ensure your FastAPI server is running!"
       );
     } finally {
       setLoading(false);
