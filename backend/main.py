@@ -42,6 +42,7 @@ class PredictionInput(BaseModel):
     income_composition: float
     hiv_aids: float
     gdp: float
+    status_developing: int = 1  # Default to 1 (Developing) or pass from React
 
 # 5. Load the saved ML model and scaler when the server starts
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -71,21 +72,17 @@ def predict_life_expectancy(data: PredictionInput):
         raise HTTPException(status_code=500, detail="Prediction model is not loaded on the server.")
 
     try:
-        # Create a pandas DataFrame matching the EXACT column names used during your training fit
         input_df = pd.DataFrame([{
             "Schooling": data.schooling,
             "Income composition of resources": data.income_composition,
             "HIV/AIDS": data.hiv_aids,
-            "GDP": data.gdp
+            "GDP": data.gdp,
+            "Status_Developing": data.status_developing
         }])
 
-        # Standardize the features using the saved scaler (No warning, no errors!)
         scaled_features = scaler.transform(input_df)
-
-        # Run the prediction
         prediction = model.predict(scaled_features)
 
-        # Return the result rounded to two decimals
         return {
             "predicted_life_expectancy": round(float(prediction[0]), 2)
         }
